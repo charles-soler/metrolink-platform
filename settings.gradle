@@ -1,0 +1,4 @@
+rootProject.name = 'metrolink-platform'
+include 'bas-core'
+include 'connector-sim'
+include 'smoke-app'

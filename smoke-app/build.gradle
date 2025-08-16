@@ -1,0 +1,21 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+group = 'org.metrolink'
+version = '0.1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation project(':bas-core')
+    // include the simulator so ServiceLoader can find it at runtime
+    implementation project(':connector-sim')
+}
+
+application {
+    mainClass = 'org.metrolink.bas.app.SmokeMain'
+}
