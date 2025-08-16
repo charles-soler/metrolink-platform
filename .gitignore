@@ -1,46 +1,42 @@
-.gradle
-build/
+# --- Gradle ---
+.gradle/
+**/build/
+
+# Keep the Gradle wrapper in VCS
 !gradle/wrapper/gradle-wrapper.jar
-!**/src/main/**/build/
-!**/src/test/**/build/
 
-### IntelliJ IDEA ###
-.idea/modules.xml
-.idea/jarRepositories.xml
-.idea/compiler.xml
-.idea/libraries/
-*.iws
+# --- IntelliJ IDEA ---
+.idea/
 *.iml
-*.ipr
 out/
-!**/src/main/**/out/
-!**/src/test/**/out/
+**/.idea/
+**/out/
 
-### Eclipse ###
-.apt_generated
+# --- VS Code ---
+.vscode/
+
+# --- Eclipse / STS / NetBeans (just in case) ---
 .classpath
-.factorypath
 .project
-.settings
+.settings/
+.apt_generated
+.factorypath
 .springBeans
 .sts4-cache
 bin/
-!**/src/main/**/bin/
-!**/src/test/**/bin/
+nbproject/private/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
 
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-
-### VS Code ###
-.vscode/
-
-# OS
+# --- OS cruft ---
 .DS_Store
+**/.DS_Store
 Thumbs.db
 
-# Logs
+# --- Logs & crash dumps ---
 *.log
+hs_err_pid*
+replay_pid*
+*.hprof
