@@ -9,3 +9,9 @@ management:
   metrics:
     tags:
       application: edge-service
+
+connectors:
+  sim:
+    ai1Start: 22.5   # try a different start temp to prove config works
+    ai1Drift: 0.15   # gentler drift
+    periodMs: 750    # faster updates
