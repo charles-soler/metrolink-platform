@@ -48,6 +48,15 @@ public final class Kernel {
         return reader.read(ids);
     }
 
+    public void writeNow(String pointId, Object value) throws Exception {
+        writer.write(pointId, value, java.util.Map.of());
+    }
+
+    public void writeNow(String pointId, Object value, java.util.Map<String,Object> opts) throws Exception {
+        writer.write(pointId, value, (opts != null ? opts : java.util.Map.of()));
+    }
+
+
     public Collection<Node> nodes() {
         return nodes.values();
     }
