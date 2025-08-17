@@ -15,3 +15,9 @@ connectors:
     ai1Start: 22.5   # try a different start temp to prove config works
     ai1Drift: 0.15   # gentler drift
     periodMs: 750    # faster updates
+  bacnet:
+    deviceInstance: 12345
+    apduTimeoutMs: 3000
+    covRenewSec: 120
+    defaultCovIncrement: 0.1
+    bbmdEnabled: false

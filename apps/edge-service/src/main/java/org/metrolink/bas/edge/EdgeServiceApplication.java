@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.ServiceLoader;
 
 @SpringBootApplication
-@EnableConfigurationProperties(SimConnectorProperties.class)
+@EnableConfigurationProperties({SimConnectorProperties.class, BacnetConnectorProperties.class})
 public class EdgeServiceApplication {
 
     public static void main(String[] args) {
