@@ -8,6 +8,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Map;
 import java.util.ServiceLoader;
 
@@ -18,6 +21,9 @@ import java.util.ServiceLoader;
         ConnectorsSelectionProperties.class
 })
 public class EdgeServiceApplication {
+
+    // ✅ inside the class
+    private static final Logger log = LoggerFactory.getLogger(EdgeServiceApplication.class);
 
     public static void main(String[] args) {
         SpringApplication.run(EdgeServiceApplication.class, args);
@@ -60,6 +66,7 @@ public class EdgeServiceApplication {
             throw new IllegalArgumentException("Unsupported connector id: " + id);
         }
 
+        log.info("Starting connector id={} with cfg={}", id, cfg);
         plugin.init(cfg);
         plugin.start();
         return plugin;
