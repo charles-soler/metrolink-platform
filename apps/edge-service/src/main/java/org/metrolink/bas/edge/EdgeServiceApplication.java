@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.ServiceLoader;
 
 @SpringBootApplication
-@EnableConfigurationProperties({SimConnectorProperties.class, BacnetConnectorProperties.class})
+@EnableConfigurationProperties({SimConnectorProperties.class, BacnetConnectorProperties.class, ConnectorsSelectionProperties.class})
 public class EdgeServiceApplication {
 
     public static void main(String[] args) {
@@ -20,22 +20,47 @@ public class EdgeServiceApplication {
     }
 
     @Bean(destroyMethod = "stop")
-    public ConnectorPlugin connectorPlugin(SimConnectorProperties props) throws Exception {
-        var plugin = ServiceLoader.load(ConnectorPlugin.class)
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException("No ConnectorPlugin found"));
+    public ConnectorPlugin connectorPlugin(
+            ConnectorsSelectionProperties selection,
+            SimConnectorProperties simProps,
+            BacnetConnectorProperties bacnetProps
+    ) throws Exception {
 
-        // Build a simple config map for the connector
-        Map<String, Object> cfg = Map.of(
-                "ai1Start", props.getAi1Start(),
-                "ai1Drift", props.getAi1Drift(),
-                "periodMs", props.getPeriodMs()
-        );
+        String id = selection.getActive(); // "sim" or "bacnet"
+
+        // Find the plugin with the matching id
+        var plugin = ServiceLoader.load(ConnectorPlugin.class)
+                .stream()
+                .map(ServiceLoader.Provider::get)
+                .filter(p -> p.id().equals(id))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("No ConnectorPlugin found with id=" + id));
+
+        // Build config map based on which connector is active
+        Map<String, Object> cfg;
+        if ("sim".equals(id)) {
+            cfg = Map.of(
+                    "ai1Start", simProps.getAi1Start(),
+                    "ai1Drift", simProps.getAi1Drift(),
+                    "periodMs", simProps.getPeriodMs()
+            );
+        } else if ("bacnet".equals(id)) {
+            cfg = Map.of(
+                    "deviceInstance", bacnetProps.getDeviceInstance(),
+                    "apduTimeoutMs", bacnetProps.getApduTimeoutMs(),
+                    "covRenewSec", bacnetProps.getCovRenewSec(),
+                    "defaultCovIncrement", bacnetProps.getDefaultCovIncrement(),
+                    "bbmdEnabled", bacnetProps.isBbmdEnabled()
+            );
+        } else {
+            throw new IllegalArgumentException("Unsupported connector id: " + id);
+        }
 
         plugin.init(cfg);
         plugin.start();
         return plugin;
     }
+
 
     @Bean
     public Kernel kernel(ConnectorPlugin plugin) {
@@ -43,5 +68,7 @@ public class EdgeServiceApplication {
     }
 
     @Bean
-    public HealthPort healthPort(ConnectorPlugin plugin) { return plugin.health(); }
+    public HealthPort healthPort(ConnectorPlugin plugin) {
+        return plugin.health();
+    }
 }

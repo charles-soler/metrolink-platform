@@ -17,6 +17,8 @@ dependencies {
     implementation project(':bas-core')
     // For now wire the sim so the app works immediately.
     implementation project(':connector-sim')
+    implementation project(':connector-bacnet')
+
 
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'

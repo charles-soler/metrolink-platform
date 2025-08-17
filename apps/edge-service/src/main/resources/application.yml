@@ -11,10 +11,11 @@ management:
       application: edge-service
 
 connectors:
+  active: bacnet  # default behavior
   sim:
-    ai1Start: 22.5   # try a different start temp to prove config works
-    ai1Drift: 0.15   # gentler drift
-    periodMs: 750    # faster updates
+    ai1Start: 22.5
+    ai1Drift: 0.15
+    periodMs: 750
   bacnet:
     deviceInstance: 12345
     apduTimeoutMs: 3000
