@@ -12,7 +12,11 @@ import java.util.Map;
 import java.util.ServiceLoader;
 
 @SpringBootApplication
-@EnableConfigurationProperties({SimConnectorProperties.class, BacnetConnectorProperties.class, ConnectorsSelectionProperties.class})
+@EnableConfigurationProperties({
+        SimConnectorProperties.class,
+        BacnetConnectorProperties.class,
+        ConnectorsSelectionProperties.class
+})
 public class EdgeServiceApplication {
 
     public static void main(String[] args) {
@@ -60,7 +64,6 @@ public class EdgeServiceApplication {
         plugin.start();
         return plugin;
     }
-
 
     @Bean
     public Kernel kernel(ConnectorPlugin plugin) {
