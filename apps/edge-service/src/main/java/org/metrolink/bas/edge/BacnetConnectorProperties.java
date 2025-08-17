@@ -13,18 +13,43 @@ public class BacnetConnectorProperties {
     private boolean bbmdEnabled = false;
 
     // getters/setters
-    public int getDeviceInstance() { return deviceInstance; }
-    public void setDeviceInstance(int deviceInstance) { this.deviceInstance = deviceInstance; }
+    public int getDeviceInstance() {
+        return deviceInstance;
+    }
 
-    public int getApduTimeoutMs() { return apduTimeoutMs; }
-    public void setApduTimeoutMs(int apduTimeoutMs) { this.apduTimeoutMs = apduTimeoutMs; }
+    public void setDeviceInstance(int deviceInstance) {
+        this.deviceInstance = deviceInstance;
+    }
 
-    public int getCovRenewSec() { return covRenewSec; }
-    public void setCovRenewSec(int covRenewSec) { this.covRenewSec = covRenewSec; }
+    public int getApduTimeoutMs() {
+        return apduTimeoutMs;
+    }
 
-    public double getDefaultCovIncrement() { return defaultCovIncrement; }
-    public void setDefaultCovIncrement(double defaultCovIncrement) { this.defaultCovIncrement = defaultCovIncrement; }
+    public void setApduTimeoutMs(int apduTimeoutMs) {
+        this.apduTimeoutMs = apduTimeoutMs;
+    }
 
-    public boolean isBbmdEnabled() { return bbmdEnabled; }
-    public void setBbmdEnabled(boolean bbmdEnabled) { this.bbmdEnabled = bbmdEnabled; }
+    public int getCovRenewSec() {
+        return covRenewSec;
+    }
+
+    public void setCovRenewSec(int covRenewSec) {
+        this.covRenewSec = covRenewSec;
+    }
+
+    public double getDefaultCovIncrement() {
+        return defaultCovIncrement;
+    }
+
+    public void setDefaultCovIncrement(double defaultCovIncrement) {
+        this.defaultCovIncrement = defaultCovIncrement;
+    }
+
+    public boolean isBbmdEnabled() {
+        return bbmdEnabled;
+    }
+
+    public void setBbmdEnabled(boolean bbmdEnabled) {
+        this.bbmdEnabled = bbmdEnabled;
+    }
 }
