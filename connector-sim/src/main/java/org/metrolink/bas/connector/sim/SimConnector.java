@@ -17,6 +17,8 @@ public final class SimConnector implements ConnectorPlugin {
     private final Map<String, Double> state = new ConcurrentHashMap<>();
     private final List<Flow.Subscriber<? super Value>> subscribers = new CopyOnWriteArrayList<>();
     private ScheduledExecutorService ses;
+    private volatile double drift = 0.2;
+    private volatile long periodMs = 1000;
 
     @Override
     public String id() {
@@ -24,8 +26,15 @@ public final class SimConnector implements ConnectorPlugin {
     }
 
     // ---- Lifecycle ----
-    @Override
-    public void init(Map<String, Object> config) { /* no-op for now */ }
+    @Override public void init(Map<String, Object> config) {
+        // Defaults if keys missing
+        double start  = ((Number) config.getOrDefault("ai1Start", 21.0)).doubleValue();
+        this.drift    = ((Number) config.getOrDefault("ai1Drift", 0.2)).doubleValue();
+        this.periodMs = ((Number) config.getOrDefault("periodMs", 1000)).longValue();
+
+        state.putIfAbsent("dev1/AI1", start);
+        state.putIfAbsent("dev1/AO1", 0.0);
+    }
 
     @Override
     public void start() {
@@ -34,18 +43,12 @@ public final class SimConnector implements ConnectorPlugin {
         state.putIfAbsent("dev1/AO1", 0.0);    // Damper Cmd (writable)
         ses = Executors.newSingleThreadScheduledExecutor();
         ses.scheduleAtFixedRate(() -> {
-            // wiggle AI1 and push to subscribers
             double cur = state.getOrDefault("dev1/AI1", 21.0);
-            double next = cur + (rnd.nextDouble() - 0.5) * 0.2; // small drift
+            double next = cur + (rnd.nextDouble() - 0.5) * drift; // use configured drift
             state.put("dev1/AI1", next);
             Value v = new Value("dev1/AI1", next, System.currentTimeMillis());
-            for (var s : subscribers) {
-                try {
-                    s.onNext(v);
-                } catch (Throwable ignore) {
-                }
-            }
-        }, 0, 1, TimeUnit.SECONDS);
+            for (var s : subscribers) { try { s.onNext(v); } catch (Throwable ignored) {} }
+        }, 0, periodMs, TimeUnit.MILLISECONDS); // use configured period
     }
 
     @Override
