@@ -22,52 +22,46 @@ import java.util.ServiceLoader;
 })
 public class EdgeServiceApplication {
 
-    // ✅ inside the class
     private static final Logger log = LoggerFactory.getLogger(EdgeServiceApplication.class);
 
     public static void main(String[] args) {
         SpringApplication.run(EdgeServiceApplication.class, args);
     }
 
-    @Bean(destroyMethod = "stop")
-    public ConnectorPlugin connectorPlugin(
+    @Bean
+    public ConnectorRuntimeInfo connectorRuntimeInfo(
             ConnectorsSelectionProperties selection,
             SimConnectorProperties simProps,
             BacnetConnectorProperties bacnetProps
-    ) throws Exception {
-
+    ) {
         String id = selection.getActive(); // "sim" or "bacnet"
+        Map<String,Object> cfg = "sim".equals(id)
+                ? Map.of(
+                "ai1Start", simProps.getAi1Start(),
+                "ai1Drift", simProps.getAi1Drift(),
+                "periodMs", simProps.getPeriodMs()
+        )
+                : Map.of(
+                "deviceInstance", bacnetProps.getDeviceInstance(),
+                "apduTimeoutMs", bacnetProps.getApduTimeoutMs(),
+                "covRenewSec", bacnetProps.getCovRenewSec(),
+                "defaultCovIncrement", bacnetProps.getDefaultCovIncrement(),
+                "bbmdEnabled", bacnetProps.isBbmdEnabled()
+        );
+        return new ConnectorRuntimeInfo(id, cfg);
+    }
 
-        // Find the plugin with the matching id
+    @Bean(destroyMethod = "stop")
+    public ConnectorPlugin connectorPlugin(ConnectorRuntimeInfo rt) throws Exception {
         var plugin = ServiceLoader.load(ConnectorPlugin.class)
                 .stream()
                 .map(ServiceLoader.Provider::get)
-                .filter(p -> p.id().equals(id))
+                .filter(p -> p.id().equals(rt.id()))
                 .findFirst()
-                .orElseThrow(() -> new IllegalStateException("No ConnectorPlugin found with id=" + id));
+                .orElseThrow(() -> new IllegalStateException("No ConnectorPlugin found with id=" + rt.id()));
 
-        // Build config map based on which connector is active
-        Map<String, Object> cfg;
-        if ("sim".equals(id)) {
-            cfg = Map.of(
-                    "ai1Start", simProps.getAi1Start(),
-                    "ai1Drift", simProps.getAi1Drift(),
-                    "periodMs", simProps.getPeriodMs()
-            );
-        } else if ("bacnet".equals(id)) {
-            cfg = Map.of(
-                    "deviceInstance", bacnetProps.getDeviceInstance(),
-                    "apduTimeoutMs", bacnetProps.getApduTimeoutMs(),
-                    "covRenewSec", bacnetProps.getCovRenewSec(),
-                    "defaultCovIncrement", bacnetProps.getDefaultCovIncrement(),
-                    "bbmdEnabled", bacnetProps.isBbmdEnabled()
-            );
-        } else {
-            throw new IllegalArgumentException("Unsupported connector id: " + id);
-        }
-
-        log.info("Starting connector id={} with cfg={}", id, cfg);
-        plugin.init(cfg);
+        log.info("Starting connector id={} with cfg={}", rt.id(), rt.cfg());
+        plugin.init(rt.cfg());
         plugin.start();
         return plugin;
     }

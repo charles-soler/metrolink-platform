@@ -1,10 +1,13 @@
 package org.metrolink.bas.edge;
 
 import org.metrolink.bas.core.Kernel;
-import org.metrolink.bas.core.model.Node;
 import org.metrolink.bas.core.model.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
 
 import java.util.List;
 import java.util.Map;
@@ -12,31 +15,56 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api")
 public class ApiController {
+
     private final Kernel kernel;
 
-    public ApiController(Kernel kernel) {
+    // metrics
+    private final Counter discoverCounter;
+    private final Counter readCounter;
+    private final Counter writeCounter;
+    private final Timer readTimer;
+
+    public ApiController(Kernel kernel, MeterRegistry registry) {
         this.kernel = kernel;
+
+        // counters/timer
+        this.discoverCounter = registry.counter("bas_discover");
+        this.readCounter = registry.counter("bas_reads");
+        this.writeCounter = registry.counter("bas_writes");
+        // name includes _seconds so Prometheus will export *_seconds_* series
+        this.readTimer = registry.timer("bas_read_latency_seconds");
+
+        // gauge node count; Micrometer will call this function when scraping
+        registry.gauge("bas_nodes_total", this.kernel, k -> (double) k.nodes().size());
     }
 
     @PostMapping("/discover")
-    public List<Node> discover() throws Exception {
-        return kernel.discoverAndRegister();
+    public List<?> discover() throws Exception {
+        var nodes = kernel.discoverAndRegister();
+        discoverCounter.increment();
+        return nodes;
     }
 
     @GetMapping("/nodes")
-    public List<Node> nodes() {
+    public List<?> nodes() {
         return kernel.nodes().stream().toList();
     }
 
     @GetMapping("/read")
     public Map<String, Value> read(@RequestParam List<String> ids) throws Exception {
-        return kernel.readNow(ids);
+        readCounter.increment();
+        var sample = Timer.start();
+        try {
+            return kernel.readNow(ids);
+        } finally {
+            sample.stop(readTimer);
+        }
     }
 
     @PostMapping("/write")
     public ResponseEntity<Void> write(@RequestParam String id, @RequestParam double value) throws Exception {
         kernel.writeNow(id, value);
+        writeCounter.increment();
         return ResponseEntity.noContent().build();
     }
-
 }
