@@ -6,12 +6,16 @@ management:
     web:
       exposure:
         include: "health,metrics,prometheus,info"
+  endpoint:
+    health:
+      show-details: always       # show component details
+      show-components: always    # include the components tree
   metrics:
     tags:
       application: edge-service
 
 connectors:
-  active: bacnet  # default behavior
+  active: sim  # default behavior
   sim:
     ai1Start: 22.5
     ai1Drift: 0.15

@@ -5,8 +5,17 @@ plugins {
 group = 'org.metrolink'
 version = '0.1.0-SNAPSHOT'
 
-repositories { mavenCentral() }
+repositories {
+    mavenCentral()
+    // BACnet4J often publishes here; add it to be safe
+    maven { url 'https://maven.mangoautomation.net/repository/ias-release/' }
+    // (optional) snapshots:
+    // maven { url 'https://maven.mangoautomation.net/repository/ias-snapshot/' }
+}
 
 dependencies {
     implementation project(':bas-core')
+
+    // ✅ BACnet4J 6.x (group changed to com.infiniteautomation)
+    implementation 'com.infiniteautomation:bacnet4j:6.0.1'
 }

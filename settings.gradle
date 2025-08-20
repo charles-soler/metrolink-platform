@@ -4,3 +4,15 @@ include 'connector-sim'
 include 'smoke-app'
 include 'apps:edge-service'
 include 'connector-bacnet'
+
+// settings.gradle
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
+    repositories {
+        mavenCentral()
+        // BACnet4J 5+ (com.infiniteautomation) lives here
+        maven { url "https://maven.mangoautomation.net/repository/ias-release/" }
+        // optional snapshots:
+        // maven { url "https://maven.mangoautomation.net/repository/ias-snapshot/" }
+    }
+}
