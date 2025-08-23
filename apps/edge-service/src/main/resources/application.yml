@@ -14,8 +14,13 @@ management:
     tags:
       application: edge-service
 
+logging:
+  level:
+    com.serotonin.bacnet4j: DEBUG
+    org.metrolink.bas.connector.bacnet: DEBUG
+
 connectors:
-  active: sim  # default behavior
+  active: bacnet
   sim:
     ai1Start: 22.5
     ai1Drift: 0.15
@@ -23,6 +28,8 @@ connectors:
   bacnet:
     deviceInstance: 12345
     apduTimeoutMs: 3000
-    covRenewSec: 120
-    defaultCovIncrement: 0.1
-    bbmdEnabled: false
+    apduSegTimeoutMs: 2000
+    apduRetries: 1
+    udpPort: 47808
+    bindAddress: 192.168.1.6      # <- your PC's LAN IP
+    broadcast: 192.168.1.255    # <- your subnet broadcast (.255 for /24)
