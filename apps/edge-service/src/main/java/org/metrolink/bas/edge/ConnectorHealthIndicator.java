@@ -1,7 +1,8 @@
 package org.metrolink.bas.edge;
 
 import org.metrolink.bas.core.ports.HealthPort;
-import org.springframework.boot.actuate.health.*;
+import org.springframework.boot.actuate.health.Health;
+import org.springframework.boot.actuate.health.HealthIndicator;
 import org.springframework.stereotype.Component;
 
 @Component

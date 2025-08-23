@@ -1,14 +1,14 @@
 package org.metrolink.bas.edge;
 
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
 import org.metrolink.bas.core.Kernel;
 import org.metrolink.bas.core.model.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.Timer;
-
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
@@ -43,6 +43,17 @@ public class ApiController {
         var nodes = kernel.discoverAndRegister();
         discoverCounter.increment();
         return nodes;
+    }
+
+    @PostMapping("/devices")
+    public List<Map<String, Object>> listDevices() throws Exception {
+        var devices = kernel.discoverDevices(Duration.ofSeconds(2)); // short wait for I-Am replies
+        return devices.stream()
+                .map(d -> Map.of(
+                        "id", d.id(),
+                        "name", d.name(),
+                        "meta", d.meta()))
+                .toList();
     }
 
     @GetMapping("/nodes")

@@ -3,13 +3,12 @@ package org.metrolink.bas.edge;
 import org.metrolink.bas.core.Kernel;
 import org.metrolink.bas.core.ports.HealthPort;
 import org.metrolink.bas.core.spi.ConnectorPlugin;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.ServiceLoader;
@@ -35,7 +34,7 @@ public class EdgeServiceApplication {
             BacnetConnectorProperties bacnetProps
     ) {
         String id = selection.getActive(); // "sim" or "bacnet"
-        Map<String,Object> cfg = "sim".equals(id)
+        Map<String, Object> cfg = "sim".equals(id)
                 ? Map.of(
                 "ai1Start", simProps.getAi1Start(),
                 "ai1Drift", simProps.getAi1Drift(),
@@ -44,9 +43,13 @@ public class EdgeServiceApplication {
                 : Map.of(
                 "deviceInstance", bacnetProps.getDeviceInstance(),
                 "apduTimeoutMs", bacnetProps.getApduTimeoutMs(),
-                "covRenewSec", bacnetProps.getCovRenewSec(),
-                "defaultCovIncrement", bacnetProps.getDefaultCovIncrement(),
-                "bbmdEnabled", bacnetProps.isBbmdEnabled()
+                "apduSegTimeoutMs", bacnetProps.getApduSegTimeoutMs(),
+                "apduRetries", bacnetProps.getApduRetries(),
+                "udpPort", bacnetProps.getUdpPort(),
+                "bindAddress", bacnetProps.getBindAddress(),
+                "broadcast", bacnetProps.getBroadcast(),
+                "bbmdEnabled", bacnetProps.isBbmdEnabled(),
+                "defaultCovIncrement", bacnetProps.getDefaultCovIncrement()
         );
         return new ConnectorRuntimeInfo(id, cfg);
     }

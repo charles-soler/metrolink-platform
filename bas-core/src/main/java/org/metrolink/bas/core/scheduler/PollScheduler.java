@@ -7,7 +7,10 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 public final class PollScheduler implements AutoCloseable {
@@ -29,8 +32,11 @@ public final class PollScheduler implements AutoCloseable {
         Objects.requireNonNull(onBatch);
 
         task = ses.scheduleAtFixedRate(() -> {
-            try { onBatch.accept(reader.read(pointIds)); }
-            catch (Exception e) { e.printStackTrace(); }
+            try {
+                onBatch.accept(reader.read(pointIds));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }, 0, interval.toMillis(), TimeUnit.MILLISECONDS);
 
         return this::stop;
@@ -40,5 +46,9 @@ public final class PollScheduler implements AutoCloseable {
         if (task != null) task.cancel(true);
     }
 
-    @Override public void close() { stop(); ses.shutdownNow(); }
+    @Override
+    public void close() {
+        stop();
+        ses.shutdownNow();
+    }
 }

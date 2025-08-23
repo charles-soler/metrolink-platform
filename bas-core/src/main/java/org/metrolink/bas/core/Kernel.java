@@ -1,8 +1,6 @@
 package org.metrolink.bas.core;
 
-import org.metrolink.bas.core.model.HealthStatus;
-import org.metrolink.bas.core.model.Node;
-import org.metrolink.bas.core.model.Value;
+import org.metrolink.bas.core.model.*;
 import org.metrolink.bas.core.ports.*;
 
 import java.time.Duration;
@@ -44,6 +42,14 @@ public final class Kernel {
         return out;
     }
 
+    public List<Device> discoverDevices(Duration timeout) throws Exception {
+        return discovery.discoverDevices(timeout);
+    }
+
+    public List<Point> discoverPoints(Device device, Duration timeout) throws Exception {
+        return discovery.discoverPoints(device, timeout);
+    }
+
     public Map<String, Value> readNow(List<String> ids) throws Exception {
         return reader.read(ids);
     }
@@ -52,7 +58,7 @@ public final class Kernel {
         writer.write(pointId, value, java.util.Map.of());
     }
 
-    public void writeNow(String pointId, Object value, java.util.Map<String,Object> opts) throws Exception {
+    public void writeNow(String pointId, Object value, java.util.Map<String, Object> opts) throws Exception {
         writer.write(pointId, value, (opts != null ? opts : java.util.Map.of()));
     }
 

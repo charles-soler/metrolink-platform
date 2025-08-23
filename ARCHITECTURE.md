@@ -8,7 +8,8 @@
 
 ## 1) Purpose
 
-This document explains the structure and rationale of the Metrolink BAS platform so future you (or new collaborators) can quickly understand:
+This document explains the structure and rationale of the Metrolink BAS platform so future you (or new collaborators)
+can quickly understand:
 
 - what each module does,
 - how connectors plug in,
@@ -21,13 +22,16 @@ If you only have 60 seconds: read sections **2**, **3**, and **6**.
 
 ## 2) High-Level Overview
 
-**Goal:** a modular, offline-capable Building Automation System with a **type-safe core** and **pluggable protocol connectors** (BACnet first).
+**Goal:** a modular, offline-capable Building Automation System with a **type-safe core** and **pluggable protocol
+connectors** (BACnet first).
 
 **Key patterns**
 
-- **Hexagonal Architecture (Ports & Adapters):** the core defines narrow interfaces (“ports”); connectors implement them.
+- **Hexagonal Architecture (Ports & Adapters):** the core defines narrow interfaces (“ports”); connectors implement
+  them.
 - **Microkernel/Plugin model:** connectors are discovered at runtime (via Java **ServiceLoader** for now).
-- **Digital-twin friendly model:** devices/points normalize to simple **Node/Point** records with metadata (units, ranges, writability).
+- **Digital-twin friendly model:** devices/points normalize to simple **Node/Point** records with metadata (units,
+  ranges, writability).
 
 **Today’s working slice**
 
@@ -132,7 +136,8 @@ interface ConnectorPlugin extends LifecyclePort {
 - `Node(id, deviceId, name, type, writable, meta)`
 - `HealthStatus(up, metrics)`
 
-> Records are final and identity-by-state. If a field holds a mutable collection, defensively copy in the canonical constructor for deep immutability.
+> Records are final and identity-by-state. If a field holds a mutable collection, defensively copy in the canonical
+> constructor for deep immutability.
 
 ---
 
@@ -240,7 +245,8 @@ The Spring app hands this to the BACnet connector’s `init(cfg)`.
 
 - **Connector threads:** a connector may run its own I/O or timers (e.g., the simulator’s 1s update).
 - **Core scheduler:** `PollScheduler` uses a single scheduled executor for now.
-- **Next:** one scheduler per priority lane; per-device concurrency limits; exponential backoff on timeouts; stop-the-world on overload to protect the historian.
+- **Next:** one scheduler per priority lane; per-device concurrency limits; exponential backoff on timeouts;
+  stop-the-world on overload to protect the historian.
 
 ---
 
@@ -298,10 +304,13 @@ The Spring app hands this to the BACnet connector’s `init(cfg)`.
 ## 15) FAQ
 
 **Why not Spring everywhere?**  
-Keeping the core Spring-free preserves plugin isolation and test speed. Spring shines at the edges: HTTP, config, metrics.
+Keeping the core Spring-free preserves plugin isolation and test speed. Spring shines at the edges: HTTP, config,
+metrics.
 
 **Why ServiceLoader?**  
-Simplest runtime discovery. If you later need hot-reload or classloader isolation, migrate the app shell to PF4J; the SPI stays the same.
+Simplest runtime discovery. If you later need hot-reload or classloader isolation, migrate the app shell to PF4J; the
+SPI stays the same.
 
 **Are records immutable?**  
-Fields are final (shallow immutability). For deep immutability, defensively copy collections in the record’s canonical constructor.
+Fields are final (shallow immutability). For deep immutability, defensively copy collections in the record’s canonical
+constructor.

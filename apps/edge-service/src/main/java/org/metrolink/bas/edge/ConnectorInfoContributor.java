@@ -9,7 +9,10 @@ import java.util.Map;
 @Component
 public class ConnectorInfoContributor implements InfoContributor {
     private final ConnectorRuntimeInfo rt;
-    public ConnectorInfoContributor(ConnectorRuntimeInfo rt) { this.rt = rt; }
+
+    public ConnectorInfoContributor(ConnectorRuntimeInfo rt) {
+        this.rt = rt;
+    }
 
     @Override
     public void contribute(Info.Builder builder) {
