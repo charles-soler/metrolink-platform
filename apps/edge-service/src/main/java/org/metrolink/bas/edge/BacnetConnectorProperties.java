@@ -6,6 +6,11 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class BacnetConnectorProperties {
 
     // Defaults you can override in application.yml
+    private Integer udpPort = 47808;
+    private String bindAddress;        // e.g. "192.168.1.6" (your PC's LAN IP)
+    private String broadcast;          // e.g. "192.168.1.255"
+    private Integer apduRetries = 1;
+    private Integer apduSegTimeoutMs = 2000;
     private int deviceInstance = 12345;
     private int apduTimeoutMs = 3000;
     private int covRenewSec = 120;
@@ -13,6 +18,46 @@ public class BacnetConnectorProperties {
     private boolean bbmdEnabled = false;
 
     // getters/setters
+    public Integer getUdpPort() {
+        return udpPort;
+    }
+
+    public void setUdpPort(Integer v) {
+        this.udpPort = v;
+    }
+
+    public String getBindAddress() {
+        return bindAddress;
+    }
+
+    public void setBindAddress(String v) {
+        this.bindAddress = v;
+    }
+
+    public String getBroadcast() {
+        return broadcast;
+    }
+
+    public void setBroadcast(String v) {
+        this.broadcast = v;
+    }
+
+    public Integer getApduRetries() {
+        return apduRetries;
+    }
+
+    public void setApduRetries(Integer v) {
+        this.apduRetries = v;
+    }
+
+    public Integer getApduSegTimeoutMs() {
+        return apduSegTimeoutMs;
+    }
+
+    public void setApduSegTimeoutMs(Integer v) {
+        this.apduSegTimeoutMs = v;
+    }
+
     public int getDeviceInstance() {
         return deviceInstance;
     }

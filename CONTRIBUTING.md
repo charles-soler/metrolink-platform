@@ -1,5 +1,5 @@
-
 ### `CONTRIBUTING.md` (root)
+
 ```markdown
 # Contributing
 

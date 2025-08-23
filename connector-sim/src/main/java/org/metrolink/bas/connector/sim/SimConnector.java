@@ -1,16 +1,18 @@
 package org.metrolink.bas.connector.sim;
 
 import org.metrolink.bas.core.model.Device;
+import org.metrolink.bas.core.model.HealthStatus;
 import org.metrolink.bas.core.model.Point;
 import org.metrolink.bas.core.model.Value;
-import org.metrolink.bas.core.model.HealthStatus;
 import org.metrolink.bas.core.ports.*;
 import org.metrolink.bas.core.spi.ConnectorPlugin;
 
 import java.time.Duration;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.*;
-import java.util.concurrent.Flow;
 
 public final class SimConnector implements ConnectorPlugin {
     private final Random rnd = new Random();
@@ -26,10 +28,11 @@ public final class SimConnector implements ConnectorPlugin {
     }
 
     // ---- Lifecycle ----
-    @Override public void init(Map<String, Object> config) {
+    @Override
+    public void init(Map<String, Object> config) {
         // Defaults if keys missing
-        double start  = ((Number) config.getOrDefault("ai1Start", 21.0)).doubleValue();
-        this.drift    = ((Number) config.getOrDefault("ai1Drift", 0.2)).doubleValue();
+        double start = ((Number) config.getOrDefault("ai1Start", 21.0)).doubleValue();
+        this.drift = ((Number) config.getOrDefault("ai1Drift", 0.2)).doubleValue();
         this.periodMs = ((Number) config.getOrDefault("periodMs", 1000)).longValue();
 
         state.putIfAbsent("dev1/AI1", start);
@@ -47,7 +50,12 @@ public final class SimConnector implements ConnectorPlugin {
             double next = cur + (rnd.nextDouble() - 0.5) * drift; // use configured drift
             state.put("dev1/AI1", next);
             Value v = new Value("dev1/AI1", next, System.currentTimeMillis());
-            for (var s : subscribers) { try { s.onNext(v); } catch (Throwable ignored) {} }
+            for (var s : subscribers) {
+                try {
+                    s.onNext(v);
+                } catch (Throwable ignored) {
+                }
+            }
         }, 0, periodMs, TimeUnit.MILLISECONDS); // use configured period
     }
 
